@@ -1,0 +1,6 @@
+@ChatAllNight.ChatService_HostAddress = http://localhost:5274
+
+GET {{ChatAllNight.ChatService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
