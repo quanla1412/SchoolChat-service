@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
-using ChatAllNight.ChatService.Models;
+using SchoolChat.Service.Models;
 
-namespace ChatAllNight.ChatService.DataService;
+namespace SchoolChat.Service.DataService;
 
 public class SharedDb
 {

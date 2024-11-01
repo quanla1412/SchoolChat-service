@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using SchoolChat.Service.Models;
 
-namespace ChatAllNight.ChatService.Controllers;
+namespace SchoolChat.Service.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("[controller]/[action]")]
 public class WeatherForecastController : ControllerBase
 {
     private static readonly string[] Summaries = new[]
@@ -12,21 +14,31 @@ public class WeatherForecastController : ControllerBase
     };
 
     private readonly ILogger<WeatherForecastController> _logger;
+    
+    private readonly ChatDbContext _dbContext;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger)
+    private readonly UserManager<User> _userManager;
+
+    public WeatherForecastController(ILogger<WeatherForecastController> logger, ChatDbContext dbContext, UserManager<User> userManager)
     {
         _logger = logger;
+        _dbContext = dbContext;
+        _userManager = userManager;
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
-    public IEnumerable<WeatherForecast> Get()
+    [ActionName("GetWeatherForecast")]
+    public IEnumerable<ChatRoom> Get()
     {
-        return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+        _logger.Log(LogLevel.Information, "User {IdentityUser} logged in", _userManager.GetUserId(User) );
+        /*return Enumerable.Range(1, 5).Select(index => new WeatherForecast
         {
             Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
             TemperatureC = Random.Shared.Next(-20, 55),
             Summary = Summaries[Random.Shared.Next(Summaries.Length)]
         })
-        .ToArray();
+        .ToArray();*/
+
+        return _dbContext.ChatRooms.ToArray();
     }
 }

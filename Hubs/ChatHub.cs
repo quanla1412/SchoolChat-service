@@ -1,15 +1,16 @@
-﻿using ChatAllNight.ChatService.DataService;
-using ChatAllNight.ChatService.Models;
+﻿using Microsoft.AspNet.SignalR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
+using SchoolChat.Service.DataService;
+using SchoolChat.Service.Models;
+using SchoolChat.Service.Service;
+using Hub = Microsoft.AspNetCore.SignalR.Hub;
 
-namespace ChatAllNight.ChatService.Hubs;
+namespace SchoolChat.Service.Hubs;
 
-public class ChatHub : Hub
+[Authorize]
+public class ChatHub(SharedDb shared, UserManager<User> userManager, IChatRoomService chatRoomService) : Hub
 {
-    private readonly SharedDb _shared;
-    
-    public ChatHub(SharedDb shared) => _shared = shared;
-    
     public async Task JoinChat(UserConnection conn)
     {
         await Clients.All
@@ -18,20 +19,20 @@ public class ChatHub : Hub
 
     public async Task JoinSpecificChatRoom(UserConnection conn)
     {
-        await Groups.AddToGroupAsync(Context.ConnectionId, conn.ChatRoom);
+        await Groups.AddToGroupAsync(Context.ConnectionId, conn.ChatRoomId);
         
-        _shared.connections[Context.ConnectionId] = conn;
+        shared.connections[Context.ConnectionId] = conn;
         
-        await Clients.Group(conn.ChatRoom)
-            .SendAsync("JoinSpecificChatRoom", "admin", $"{conn.Username} has joined {conn.ChatRoom}");
+        await Clients.Group(conn.ChatRoomId)
+            .SendAsync("JoinSpecificChatRoom", "admin", $"{conn.UserId} has joined {conn.ChatRoomId}");
     }
 
     public async Task SendMessage(string msg)
     {
-        if (_shared.connections.TryGetValue(Context.ConnectionId, out UserConnection conn))
+        if (shared.connections.TryGetValue(Context.ConnectionId, out UserConnection conn))
         {
-            await Clients.Group(conn.ChatRoom)
-                .SendAsync("ReceiveMessage", conn.Username, msg);
+            await Clients.Group(conn.ChatRoomId)
+                .SendAsync("ReceiveMessage", conn.UserId, msg);
         }
     }
 }

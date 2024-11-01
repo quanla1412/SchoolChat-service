@@ -1,4 +1,4 @@
-namespace ChatAllNight.ChatService;
+namespace SchoolChat.Service;
 
 public class WeatherForecast
 {
