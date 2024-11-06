@@ -10,6 +10,16 @@ namespace SchoolChat.Service.Controllers;
 [Route("[controller]/[action]")]
 public class ChatRoomController(UserManager<User> userManager, IChatRoomService chatRoomService) : ControllerBase
 {
+    [HttpGet]
+    [ActionName("GetChatRooms")]
+    public List<ChatRoomViewModel> GetChatRooms()
+    {
+        string currentUserId = userManager.GetUserId(User);
+        List<ChatRoomViewModel> result = chatRoomService.GetChatRoomsByUserId(currentUserId);
+
+        return result;
+    }
+    
     [HttpPost]
     [ActionName("Create")]
     public IActionResult Create([FromBody] CreateChatRoomViewModel model)

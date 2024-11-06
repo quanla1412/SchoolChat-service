@@ -32,7 +32,11 @@ public class ChatHub(SharedDb shared, UserManager<User> userManager, IChatRoomSe
         if (shared.connections.TryGetValue(Context.ConnectionId, out UserConnection conn))
         {
             await Clients.Group(conn.ChatRoomId)
-                .SendAsync("ReceiveMessage", conn.UserId, msg);
+                .SendAsync("ReceiveMessage", conn.UserId, new
+                {
+                    Message = msg,
+                    Time = DateTime.Now
+                });
         }
     }
 }

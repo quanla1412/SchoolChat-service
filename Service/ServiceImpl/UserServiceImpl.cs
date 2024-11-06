@@ -18,7 +18,7 @@ public class UserServiceImpl(IUserRepository userRepository) : IUserService
             Id = user.Id,
             Email = user.Email,
             Name = user.Name,
-            Username = user.UserName,
+            UserName = user.UserName,
         };
     }
 
@@ -34,7 +34,7 @@ public class UserServiceImpl(IUserRepository userRepository) : IUserService
                 Id = user.Id,
                 Email = user.Email,
                 Name = user.Name,
-                Username = user.UserName,
+                UserName = user.UserName,
             });
         }
 

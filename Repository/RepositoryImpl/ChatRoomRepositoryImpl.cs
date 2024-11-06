@@ -1,19 +1,32 @@
-﻿using SchoolChat.Service.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using SchoolChat.Service.Models;
 
 namespace SchoolChat.Service.Repository.RepositoryImpl;
 
-public class ChatRoomRepositoryImpl : IChatRoomRepository
+public class ChatRoomRepositoryImpl(ChatDbContext context) : IChatRoomRepository
 {
-    private readonly ChatDbContext _context;
-
-    public ChatRoomRepositoryImpl(ChatDbContext context)
+    public List<ChatRoom> GetChatRoomsByUserId(string userId)
     {
-        _context = context;
+        List<ChatRoom> result = context.ChatRooms.Where(chatRoom => chatRoom.Users.Any(user => user.User.Id == userId))
+            .Include(chatRoom => chatRoom.Users)
+            .ThenInclude(charRoomUser => charRoomUser.User)
+            .ToList();
+        return result;
+    }
+
+    public ChatRoom? GetChatRoomByUsers(string fromUserId, string toUserId)
+    {
+        ChatRoom? result = context.ChatRooms
+            .First(chatRoom => 
+                chatRoom.Users.Count(user => user.User.Id == fromUserId || user.User.Id == toUserId) == 2
+                );
+
+        return result;
     }
 
     public void Add(ChatRoom chatRoom)
     {
-        _context.ChatRooms.Add(chatRoom);
-        _context.SaveChanges();
+        context.ChatRooms.Add(chatRoom);
+        context.SaveChanges();
     }
 }
