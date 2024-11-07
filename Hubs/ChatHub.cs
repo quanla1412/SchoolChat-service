@@ -1,15 +1,15 @@
 ﻿using Microsoft.AspNet.SignalR;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using SchoolChat.Service.DataService;
 using SchoolChat.Service.Models;
-using SchoolChat.Service.Service;
+using SchoolChat.Service.Service.ServiceImpl;
+using SchoolChat.Service.ViewModel;
 using Hub = Microsoft.AspNetCore.SignalR.Hub;
 
 namespace SchoolChat.Service.Hubs;
 
 [Authorize]
-public class ChatHub(SharedDb shared, UserManager<User> userManager, IChatRoomService chatRoomService) : Hub
+public class ChatHub(SharedDb shared, IMessageService messageService) : Hub
 {
     public async Task JoinChat(UserConnection conn)
     {
@@ -31,12 +31,16 @@ public class ChatHub(SharedDb shared, UserManager<User> userManager, IChatRoomSe
     {
         if (shared.connections.TryGetValue(Context.ConnectionId, out UserConnection conn))
         {
+            CreateMessageViewModel createMessageViewModel = new CreateMessageViewModel()
+            {
+                ChatRoomId = conn.ChatRoomId,
+                FromUserId = conn.UserId,
+                Text = msg
+            };
+            MessageViewModel message = messageService.Add(createMessageViewModel);
+            
             await Clients.Group(conn.ChatRoomId)
-                .SendAsync("ReceiveMessage", conn.UserId, new
-                {
-                    Message = msg,
-                    Time = DateTime.Now
-                });
+                .SendAsync("ReceiveMessage", message);
         }
     }
 }

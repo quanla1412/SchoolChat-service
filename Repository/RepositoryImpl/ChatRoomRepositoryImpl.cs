@@ -17,7 +17,7 @@ public class ChatRoomRepositoryImpl(ChatDbContext context) : IChatRoomRepository
     public ChatRoom? GetChatRoomByUsers(string fromUserId, string toUserId)
     {
         ChatRoom? result = context.ChatRooms
-            .First(chatRoom => 
+            .FirstOrDefault(chatRoom => 
                 chatRoom.Users.Count(user => user.User.Id == fromUserId || user.User.Id == toUserId) == 2
                 );
 

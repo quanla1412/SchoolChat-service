@@ -4,8 +4,11 @@ using SchoolChat.Service.ViewModel;
 
 namespace SchoolChat.Service.Service.ServiceImpl;
 
-public class ChatRoomServiceImpl(IUserRepository userRepository, IChatRoomRepository chatRoomRepository)
-    : IChatRoomService
+public class ChatRoomServiceImpl(
+    IUserRepository userRepository, 
+    IChatRoomRepository chatRoomRepository,
+    IMessageService messageService
+    ) : IChatRoomService
 {
     public List<ChatRoomViewModel> GetChatRoomsByUserId(string userId)
     {
@@ -32,7 +35,8 @@ public class ChatRoomServiceImpl(IUserRepository userRepository, IChatRoomReposi
             {
                 Id = chatRoom.Id,
                 Name = chatRoom.Name,
-                Users = users
+                Users = users,
+                NewestMessage = messageService.GetNewestMessagesByChatRoomId(chatRoom.Id)
             });
         }
         
