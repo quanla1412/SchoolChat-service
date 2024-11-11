@@ -7,4 +7,6 @@ public interface IUserService
     UserViewModel? GetUserById(string id);
     
     List<UserViewModel> GetUsers(string searchString);
+    
+    UpdateProfileViewModel UpdateProfile(UpdateProfileViewModel model);
 }

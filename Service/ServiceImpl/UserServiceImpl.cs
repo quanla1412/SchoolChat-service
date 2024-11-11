@@ -1,4 +1,5 @@
-﻿using SchoolChat.Service.Models;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using SchoolChat.Service.Models;
 using SchoolChat.Service.Repository;
 using SchoolChat.Service.ViewModel;
 
@@ -39,5 +40,29 @@ public class UserServiceImpl(IUserRepository userRepository) : IUserService
         }
 
         return usersViewModel;
+    }
+
+    public UpdateProfileViewModel UpdateProfile(UpdateProfileViewModel model)
+    {
+        User user = userRepository.GetUserById(model.Id);
+        
+        if (user == null)
+            throw new KeyNotFoundException("User not found.");
+        
+        user.Name = model.Name;
+        user.Birthday = model.Birthday;
+        user.Gender = model.Gender;
+        user.PhoneNumber = model.Phone;
+        
+        userRepository.UpdateProfile(user);
+
+        return new UpdateProfileViewModel()
+        {
+            Id = user.Id,
+            Name = user.Name,
+            Birthday = user.Birthday,
+            Gender = user.Gender,
+            Phone = user.PhoneNumber
+        };
     }
 }

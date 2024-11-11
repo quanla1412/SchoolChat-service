@@ -20,4 +20,21 @@ public class UserRepositoryImpl : IUserRepository
     {
         return _context.Users.Where(user => user.Email.Contains(searchString)).ToList();
     }
+
+    public User UpdateProfile(User user)
+    {
+        var existingUser = _context.Users.Find(user.Id);
+        if (existingUser == null)
+            throw new KeyNotFoundException("User not found.");
+
+        existingUser.Name = user.Name;
+        existingUser.Birthday = user.Birthday;
+        existingUser.Gender = user.Gender;
+        existingUser.PhoneNumber = user.PhoneNumber;
+        
+        _context.Users.Update(existingUser);
+        _context.SaveChanges();
+
+        return existingUser;
+    }
 }
