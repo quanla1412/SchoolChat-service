@@ -30,7 +30,6 @@ public class UserRepositoryImpl : IUserRepository
         existingUser.Name = user.Name;
         existingUser.Birthday = user.Birthday;
         existingUser.Gender = user.Gender;
-        existingUser.Email = user.Email;
         existingUser.PhoneNumber = user.PhoneNumber;
         
         _context.Users.Update(existingUser);

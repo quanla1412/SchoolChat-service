@@ -52,7 +52,6 @@ public class UserServiceImpl(IUserRepository userRepository) : IUserService
         user.Name = model.Name;
         user.Birthday = model.Birthday;
         user.Gender = model.Gender;
-        user.Email = model.Email;
         user.PhoneNumber = model.Phone;
         
         userRepository.UpdateProfile(user);
@@ -63,7 +62,6 @@ public class UserServiceImpl(IUserRepository userRepository) : IUserService
             Name = user.Name,
             Birthday = user.Birthday,
             Gender = user.Gender,
-            Email = user.Email,
             Phone = user.PhoneNumber
         };
     }
