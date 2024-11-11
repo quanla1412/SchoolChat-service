@@ -23,7 +23,28 @@ public class UserController(UserManager<User> userManager, IUserService userServ
     {
         return userService.GetUsers(searchString);
     }
-    
+
+    [HttpPost]
+    [ActionName("UpdateProfile")]
+    public IActionResult UpdateProfile(UpdateProfileViewModel profileViewModel)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        
+        try
+        {
+            var updatedUser = userService.UpdateProfile(profileViewModel);
+            return Ok(updatedUser);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new
+            {
+                message = "An error occurred while updating the profile.",
+                details = ex.Message
+            });
+        }
+    }
     /*[HttpPost(Name = "SignUp")]
     public Profile SignUp([FromBody] RegisterViewModel model)
     {
