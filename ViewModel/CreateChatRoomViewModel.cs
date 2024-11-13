@@ -2,5 +2,7 @@
 
 public class CreateChatRoomViewModel
 {
-    public string ToUserId { get; set; }
+    public string? Name { get; set; }
+    public string? FromUserId { get; set; }
+    public List<string> ToUserIds { get; set; }
 }

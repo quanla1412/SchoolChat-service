@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchoolChat.Service;
 
@@ -11,9 +12,11 @@ using SchoolChat.Service;
 namespace SchoolChat.Service.Migrations
 {
     [DbContext(typeof(ChatDbContext))]
-    partial class ChatDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241109080454_ReadMessageStatus")]
+    partial class ReadMessageStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -219,7 +222,6 @@ namespace SchoolChat.Service.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("MessageId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("ReadDate")
@@ -233,7 +235,7 @@ namespace SchoolChat.Service.Migrations
 
                     b.HasIndex("MessageId");
 
-                    b.ToTable("ReadMessageStatuses");
+                    b.ToTable("ReadMessageStatus");
                 });
 
             modelBuilder.Entity("SchoolChat.Service.Models.User", b =>
@@ -372,9 +374,7 @@ namespace SchoolChat.Service.Migrations
                 {
                     b.HasOne("SchoolChat.Service.Models.Message", null)
                         .WithMany("ReadStatuses")
-                        .HasForeignKey("MessageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("MessageId");
                 });
 
             modelBuilder.Entity("SchoolChat.Service.Models.ChatRoom", b =>

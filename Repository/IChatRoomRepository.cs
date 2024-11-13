@@ -6,7 +6,7 @@ public interface IChatRoomRepository
 {
     List<ChatRoom> GetChatRoomsByUserId(string userId);
     
-    ChatRoom? GetChatRoomByUsers(string fromUserId, string toUserId);
+    ChatRoom? GetChatRoomByUsers(string fromUserId, List<string> toUserIds);
     
     void Add(ChatRoom chatRoom);
 }

@@ -16,8 +16,13 @@ public class UserRepositoryImpl : IUserRepository
         return _context.Users.SingleOrDefault(u => u.Id == id);
     }
 
-    public List<User> GetUsers(string searchString)
+    public List<User> GetUsers(string searchString, string? excludeUserId )
     {
-        return _context.Users.Where(user => user.Email.Contains(searchString)).ToList();
+        var query = _context.Users.Where(user => user.Email.Contains(searchString));
+        if (excludeUserId != null)
+        {
+            query = query.Where(user => user.Id != excludeUserId);
+        }
+        return query.ToList();
     }
 }

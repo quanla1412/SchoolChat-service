@@ -1,4 +1,6 @@
-﻿namespace SchoolChat.Service.Models;
+﻿using SchoolChat.Service.ViewModel;
+
+namespace SchoolChat.Service.Models;
 
 public class MessageViewModel
 {
@@ -7,4 +9,5 @@ public class MessageViewModel
     public string FromUserId { get; set; }
     public string Text { get; set; }
     public DateTime SentDate { get; set; }
+    public List<ReadMessageStatusViewModel> ReadStatuses { get; set; }
 }

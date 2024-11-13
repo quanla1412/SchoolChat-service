@@ -55,6 +55,7 @@ builder.Services.AddScoped<IMessageService, MessageServiceImpl>();
 builder.Services.AddScoped<IUserRepository, UserRepositoryImpl>();
 builder.Services.AddScoped<IChatRoomRepository, ChatRoomRepositoryImpl>();
 builder.Services.AddScoped<IMessageRepository, MessageRepositoryImpl>();
+builder.Services.AddScoped<IReadMessageStatusRepository, ReadMessageStatusRepositoryImpl>();
 
 var app = builder.Build();
 
