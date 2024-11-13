@@ -23,9 +23,9 @@ public class UserServiceImpl(IUserRepository userRepository) : IUserService
         };
     }
 
-    public List<UserViewModel> GetUsers(string searchString)
+    public List<UserViewModel> GetUsers(string searchString, string? excludeUserId)
     {
-        List<User> users = userRepository.GetUsers(searchString);
+        List<User> users = userRepository.GetUsers(searchString, excludeUserId);
         List<UserViewModel> usersViewModel = new List<UserViewModel>();
         
         foreach (User user in users)

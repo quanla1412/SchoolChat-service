@@ -7,4 +7,5 @@ public class Message
     public string FromUserId { get; set; }
     public string Text { get; set; }
     public DateTime SentDate { get; set; }
+    public List<ReadMessageStatus> ReadStatuses { get; set; }
 }

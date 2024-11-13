@@ -23,6 +23,8 @@ public class ChatHub(SharedDb shared, IMessageService messageService) : Hub
         
         shared.connections[Context.ConnectionId] = conn;
         
+        messageService.MarkReadMessageByChatRoomId(conn.ChatRoomId, conn.UserId);
+        
         await Clients.Group(conn.ChatRoomId)
             .SendAsync("JoinSpecificChatRoom", "admin", $"{conn.UserId} has joined {conn.ChatRoomId}");
     }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchoolChat.Service;
 
@@ -11,9 +12,11 @@ using SchoolChat.Service;
 namespace SchoolChat.Service.Migrations
 {
     [DbContext(typeof(ChatDbContext))]
-    partial class ChatDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241109084749_ReadMessageStatusContext")]
+    partial class ReadMessageStatusContext
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -219,7 +222,6 @@ namespace SchoolChat.Service.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("MessageId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("ReadDate")
@@ -244,9 +246,6 @@ namespace SchoolChat.Service.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("Birthday")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -257,9 +256,6 @@ namespace SchoolChat.Service.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<string>("Gender")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -378,9 +374,7 @@ namespace SchoolChat.Service.Migrations
                 {
                     b.HasOne("SchoolChat.Service.Models.Message", null)
                         .WithMany("ReadStatuses")
-                        .HasForeignKey("MessageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("MessageId");
                 });
 
             modelBuilder.Entity("SchoolChat.Service.Models.ChatRoom", b =>

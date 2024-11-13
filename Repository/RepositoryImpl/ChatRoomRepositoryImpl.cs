@@ -14,11 +14,11 @@ public class ChatRoomRepositoryImpl(ChatDbContext context) : IChatRoomRepository
         return result;
     }
 
-    public ChatRoom? GetChatRoomByUsers(string fromUserId, string toUserId)
+    public ChatRoom? GetChatRoomByUsers(string fromUserId, List<string> toUserIds)
     {
         ChatRoom? result = context.ChatRooms
             .FirstOrDefault(chatRoom => 
-                chatRoom.Users.Count(user => user.User.Id == fromUserId || user.User.Id == toUserId) == 2
+                chatRoom.Users.Count(user => user.User.Id == fromUserId || toUserIds.Contains(user.User.Id)) == toUserIds.Count + 1
                 );
 
         return result;

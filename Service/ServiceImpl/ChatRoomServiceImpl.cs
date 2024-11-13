@@ -43,16 +43,15 @@ public class ChatRoomServiceImpl(
         return result;
     }
 
-    public ChatRoomViewModel CreateChatRoom(string fromUserId, string toUserId)
+    public ChatRoomViewModel CreateChatRoom(CreateChatRoomViewModel model)
     {
         ChatRoom result;
-        ChatRoom? existedChatRoom = chatRoomRepository.GetChatRoomByUsers(fromUserId, toUserId);
+        ChatRoom? existedChatRoom = chatRoomRepository.GetChatRoomByUsers(model.FromUserId, model.ToUserIds);
         if (existedChatRoom == null)
         {
             List<ChatRoomUser> chatRoomUsers = new List<ChatRoomUser>();
-            User? fromUser = userRepository.GetUserById(fromUserId);
-            User? toUser = userRepository.GetUserById(toUserId);
-            if (fromUser == null || toUser == null) 
+            User? fromUser = userRepository.GetUserById(model.FromUserId);
+            if (fromUser == null) 
                 throw new Exception("User not found");
         
             chatRoomUsers.Add(new ChatRoomUser()
@@ -60,16 +59,24 @@ public class ChatRoomServiceImpl(
                 Id = Guid.NewGuid().ToString(),
                 User = fromUser
             });
-        
-            chatRoomUsers.Add(new ChatRoomUser()
+            
+            model.ToUserIds.ForEach(toUserId =>
             {
-                Id = Guid.NewGuid().ToString(),
-                User = toUser
+                User? toUser = userRepository.GetUserById(toUserId);
+                if (toUser == null) 
+                    throw new Exception("User not found");
+                
+                chatRoomUsers.Add(new ChatRoomUser()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    User = toUser
+                });
             });
 
             result = new ChatRoom()
             {
                 Id = Guid.NewGuid().ToString(),
+                Name = model.Name,
                 Users = chatRoomUsers
             };
         

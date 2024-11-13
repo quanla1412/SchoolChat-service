@@ -19,9 +19,9 @@ public class UserController(UserManager<User> userManager, IUserService userServ
     
     [HttpGet]
     [ActionName("GetUsers")]
-    public IEnumerable<UserViewModel> GetUsers([FromQuery] string searchString = "")
+    public IEnumerable<UserViewModel> GetUsers([FromQuery] string searchString = "", [FromQuery] bool excludeCurrentUser = false)
     {
-        return userService.GetUsers(searchString);
+        return userService.GetUsers(searchString, excludeCurrentUser ? userManager.GetUserId(User) : null);
     }
 
     [HttpPost]

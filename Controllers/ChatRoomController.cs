@@ -24,8 +24,8 @@ public class ChatRoomController(UserManager<User> userManager, IChatRoomService 
     [ActionName("Create")]
     public IActionResult Create([FromBody] CreateChatRoomViewModel model)
     {
-        string currentUserId = userManager.GetUserId(User);
-        ChatRoomViewModel result = chatRoomService.CreateChatRoom(currentUserId, model.ToUserId);
+        model.FromUserId = userManager.GetUserId(User);
+        ChatRoomViewModel result = chatRoomService.CreateChatRoom(model);
         
         return Ok(result);
     }
