@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchoolChat.Service;
 
@@ -11,9 +12,11 @@ using SchoolChat.Service;
 namespace SchoolChat.Service.Migrations
 {
     [DbContext(typeof(ChatDbContext))]
-    partial class ChatDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241111144820_RemoveEmail")]
+    partial class RemoveEmail
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -213,29 +216,6 @@ namespace SchoolChat.Service.Migrations
                     b.ToTable("Messages");
                 });
 
-            modelBuilder.Entity("SchoolChat.Service.Models.ReadMessageStatus", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("MessageId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("ReadDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MessageId");
-
-                    b.ToTable("ReadMessageStatuses");
-                });
-
             modelBuilder.Entity("SchoolChat.Service.Models.User", b =>
                 {
                     b.Property<string>("Id")
@@ -374,23 +354,9 @@ namespace SchoolChat.Service.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SchoolChat.Service.Models.ReadMessageStatus", b =>
-                {
-                    b.HasOne("SchoolChat.Service.Models.Message", null)
-                        .WithMany("ReadStatuses")
-                        .HasForeignKey("MessageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("SchoolChat.Service.Models.ChatRoom", b =>
                 {
                     b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("SchoolChat.Service.Models.Message", b =>
-                {
-                    b.Navigation("ReadStatuses");
                 });
 #pragma warning restore 612, 618
         }

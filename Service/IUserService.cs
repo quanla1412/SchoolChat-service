@@ -6,5 +6,7 @@ public interface IUserService
 {
     UserViewModel? GetUserById(string id);
     
-    List<UserViewModel> GetUsers(string searchString, string? excludeUserId );
+    List<UserViewModel> GetUsers(string searchString, string? excludeUserId);
+  
+    UpdateProfileViewModel UpdateProfile(UpdateProfileViewModel model);
 }
