@@ -18,8 +18,11 @@ public class UserServiceImpl(IUserRepository userRepository) : IUserService
         {
             Id = user.Id,
             Email = user.Email,
-            Name = user.Name,
+            Name = user.Name ?? user.Email,
             UserName = user.UserName,
+            Gender = user.Gender,
+            Birthday = user.Birthday,
+            Phone = user.PhoneNumber
         };
     }
 
