@@ -127,4 +127,38 @@ public class MessageServiceImpl(
             SentDate = message.SentDate
         };
     }
+    
+    public Message ForwardMessage(ForwardMessageModel model)
+    {
+        Message message = messageRepository.GetMessageById(model.MessageId);
+        if (message == null)
+            return null;
+
+        Message forwardedMessage = new Message
+        {
+            Id = Guid.NewGuid().ToString(),
+            ChatRoomId = model.ChatRoomId,
+            FromUserId = message.FromUserId,
+            Text = message.Text,
+            SentDate = DateTime.UtcNow,
+            ReadStatuses = new List<ReadMessageStatus>(),
+            IsForwarded = true,
+            IsPinned = false
+        };
+
+        messageRepository.Add(forwardedMessage);
+        return forwardedMessage;
+    }
+
+    public Message PinMessage(string messageId)
+    {
+        Message message = messageRepository.GetMessageById(messageId);
+        if (message == null)
+            return null;
+
+        message.IsPinned = true;
+        
+        messageRepository.Update(message);
+        return message;
+    }
 }

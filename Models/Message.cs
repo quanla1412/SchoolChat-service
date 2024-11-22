@@ -8,4 +8,6 @@ public class Message
     public string Text { get; set; }
     public DateTime SentDate { get; set; }
     public List<ReadMessageStatus> ReadStatuses { get; set; }
+    public Boolean IsForwarded { get; set; }
+    public Boolean IsPinned { get; set; }
 }

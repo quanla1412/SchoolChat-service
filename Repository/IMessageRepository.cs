@@ -7,4 +7,6 @@ public interface IMessageRepository
     List<Message> GetMessagesByChatRoomId(string chatRoomId);
     Message? GetNewestMessagesByChatRoomId(string chatRoomId);
     void Add(Message message);
+    Message GetMessageById(string messageId);
+    void Update(Message message);
 }

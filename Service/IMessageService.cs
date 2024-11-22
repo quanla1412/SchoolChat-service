@@ -10,4 +10,6 @@ public interface IMessageService
     ReadMessageStatusViewModel MarkReadMessage(string messageId, string userId);
     void MarkReadMessageByChatRoomId(string chatRoomId, string userId);
     MessageViewModel Add(CreateMessageViewModel message);
+    Message ForwardMessage(ForwardMessageModel message);
+    Message PinMessage(string messageId);
 }
