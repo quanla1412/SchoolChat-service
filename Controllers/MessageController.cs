@@ -23,4 +23,32 @@ public class MessageController(UserManager<User> userManager, IMessageService me
     {
         return messageService.MarkReadMessage(messageId, userManager.GetUserId(User));
     }
+    
+    [HttpPost("Forward")]
+    public ActionResult<Message> ForwardMessage([FromBody] ForwardMessageModel model)
+    {
+        try
+        {
+            var forwardedMessage = messageService.ForwardMessage(model);
+            return Ok(forwardedMessage);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+
+    [HttpGet("Pin")]
+    public ActionResult<Message> PinMessage([FromQuery] string messageId)
+    {
+        try
+        {
+            var pinnedMessage = messageService.PinMessage(messageId);
+            return Ok(pinnedMessage);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
 }

@@ -29,4 +29,17 @@ public class MessageRepositoryImpl(ChatDbContext context) : IMessageRepository
         context.Messages.Add(message);
         context.SaveChanges();
     }
+
+    public Message? GetMessageById(string messageId)
+    {
+        return context.Messages
+            .Include(message => message.ReadStatuses)
+            .FirstOrDefault(message => message.Id == messageId);
+    }
+    
+    public void Update(Message message)
+    {
+        context.Messages.Update(message);
+        context.SaveChanges();
+    }
 }
