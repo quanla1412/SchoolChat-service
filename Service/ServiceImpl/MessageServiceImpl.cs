@@ -8,7 +8,8 @@ namespace SchoolChat.Service.Service.ServiceImpl;
 public class MessageServiceImpl(
     IMessageRepository messageRepository, 
     IReadMessageStatusRepository readMessageStatusRepository,
-    IDeleteMessageUserRepository deleteMessageUserRepository
+    IDeleteMessageUserRepository deleteMessageUserRepository,
+    IUserRepository userRepository
     ) : IMessageService
 {
     public List<MessageViewModel> GetMessagesByChatRoomId(string chatRoomId)
@@ -65,6 +66,26 @@ public class MessageServiceImpl(
             SentDate = message.SentDate,
             Text = message.Text,
             ReadStatuses = readStatusViewModels
+        };
+    }
+
+    public PinnedMessageViewModel? GetPinnedMessagesByChatRoomId(string chatRoomId)
+    {
+        Message? message = messageRepository.GetPinnedMessageByChatRoomId(chatRoomId);
+        if (message == null)
+            return null;
+        
+        User? fromUser = userRepository.GetUserById(message.FromUserId);
+        
+        return new PinnedMessageViewModel()
+        {
+            Id = message.Id,
+            Text = message.Text,
+            FromUser = new ShortUserViewModel()
+            {
+                Id = message.FromUserId,
+                Name = fromUser?.Name ?? fromUser?.Email
+            }
         };
     }
 
@@ -153,13 +174,13 @@ public class MessageServiceImpl(
         return forwardedMessage;
     }
 
-    public Message? PinMessage(string messageId)
+    public PinnedMessageViewModel? PinMessage(string messageId)
     {
         Message? message = messageRepository.GetMessageById(messageId);
         if (message == null)
             return null;
         
-        Message? pinMessage = messageRepository.GetPinMessageByChatRoomId(message.ChatRoomId);
+        Message? pinMessage = messageRepository.GetPinnedMessageByChatRoomId(message.ChatRoomId);
         if (pinMessage != null)
         {
             pinMessage.IsPinned = false;
@@ -170,7 +191,24 @@ public class MessageServiceImpl(
         
         messageRepository.Update(message);
         
-        return message;
+        User? fromUser = userRepository.GetUserById(message.FromUserId);
+        ShortUserViewModel? fromUserViewModel = null;
+        if (fromUser != null)
+        {
+            fromUserViewModel = new ShortUserViewModel()
+            {
+                Id = message.FromUserId,
+                Name = fromUser.Name ?? fromUser.Email
+            };
+        }
+        
+        return new PinnedMessageViewModel()
+        {
+            Id = pinMessage.Id,
+            ChatRoomId = message.ChatRoomId,
+            FromUser = fromUserViewModel,
+            Text = message.Text
+        };
     }
     
     public Message? UnsentMessage(string messageId, string currentUserId)

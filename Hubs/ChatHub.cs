@@ -45,4 +45,15 @@ public class ChatHub(SharedDb shared, IMessageService messageService) : Hub
                 .SendAsync("ReceiveMessage", message);
         }
     }
+    
+    public async Task PinMessage(string messageId)
+    {
+        if (shared.connections.TryGetValue(Context.ConnectionId, out UserConnection conn))
+        {
+            var pinnedMessage = messageService.PinMessage(messageId);
+            
+            await Clients.Group(conn.ChatRoomId)
+                .SendAsync("NewPinnedMessage", pinnedMessage);
+        }
+    }
 }

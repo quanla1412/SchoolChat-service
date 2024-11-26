@@ -43,6 +43,22 @@ public class ChatRoomServiceImpl(
         return result;
     }
 
+    public ChatRoomDetailViewModel? GetChatRoomById(string id)
+    {
+        ChatRoom? chatRoom = chatRoomRepository.GetChatRoomById(id);
+        if (chatRoom == null)
+        {
+            return null;
+        }
+
+        return new ChatRoomDetailViewModel()
+        {
+            Id = chatRoom.Id,
+            Name = chatRoom.Name,
+            PinnedMessage = messageService.GetPinnedMessagesByChatRoomId(chatRoom.Id)
+        };
+    }
+
     public ChatRoomViewModel CreateChatRoom(CreateChatRoomViewModel model)
     {
         ChatRoom result;

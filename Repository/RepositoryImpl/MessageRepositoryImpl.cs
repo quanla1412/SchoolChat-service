@@ -43,7 +43,7 @@ public class MessageRepositoryImpl(ChatDbContext context) : IMessageRepository
         context.SaveChanges();
     }
 
-    public Message? GetPinMessageByChatRoomId(string chatRoomId)
+    public Message? GetPinnedMessageByChatRoomId(string chatRoomId)
     {
         return context.Messages
             .Include(message => message.ReadStatuses)

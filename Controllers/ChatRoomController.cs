@@ -20,6 +20,15 @@ public class ChatRoomController(UserManager<User> userManager, IChatRoomService 
         return result;
     }
     
+    [HttpGet]
+    [ActionName("Detail")]
+    public ChatRoomDetailViewModel GetChatRooms([FromQuery] string id)
+    {
+        ChatRoomDetailViewModel result = chatRoomService.GetChatRoomById(id);
+
+        return result;
+    }
+    
     [HttpPost]
     [ActionName("Create")]
     public IActionResult Create([FromBody] CreateChatRoomViewModel model)

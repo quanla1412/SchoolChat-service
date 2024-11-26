@@ -9,5 +9,5 @@ public interface IMessageRepository
     void Add(Message message);
     Message? GetMessageById(string messageId);
     void Update(Message message);
-    Message? GetPinMessageByChatRoomId(string chatRoomId);
+    Message? GetPinnedMessageByChatRoomId(string chatRoomId);
 }

@@ -4,6 +4,8 @@ namespace SchoolChat.Service.Repository;
 
 public interface IChatRoomRepository
 {
+    ChatRoom? GetChatRoomById(string id);
+    
     List<ChatRoom> GetChatRoomsByUserId(string userId);
     
     ChatRoom? GetChatRoomByUsers(string fromUserId, List<string> toUserIds);

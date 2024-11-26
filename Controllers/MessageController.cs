@@ -38,7 +38,8 @@ public class MessageController(UserManager<User> userManager, IMessageService me
         }
     }
 
-    [HttpGet("Pin")]
+    [HttpGet]
+    [ActionName("Pin")]
     public ActionResult<Message> PinMessage([FromQuery] string messageId)
     {
         try
