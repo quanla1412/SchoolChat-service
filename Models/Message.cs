@@ -10,4 +10,5 @@ public class Message
     public List<ReadMessageStatus> ReadStatuses { get; set; }
     public Boolean IsForwarded { get; set; }
     public Boolean IsPinned { get; set; }
+    public Boolean IsUnsent { get; set; }
 }

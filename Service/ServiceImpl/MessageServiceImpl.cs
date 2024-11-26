@@ -1,4 +1,5 @@
-﻿using SchoolChat.Service.Models;
+﻿using Microsoft.AspNetCore.Identity;
+using SchoolChat.Service.Models;
 using SchoolChat.Service.Repository;
 using SchoolChat.Service.ViewModel;
 
@@ -6,7 +7,8 @@ namespace SchoolChat.Service.Service.ServiceImpl;
 
 public class MessageServiceImpl(
     IMessageRepository messageRepository, 
-    IReadMessageStatusRepository readMessageStatusRepository
+    IReadMessageStatusRepository readMessageStatusRepository,
+    IDeleteMessageUserRepository deleteMessageUserRepository
     ) : IMessageService
 {
     public List<MessageViewModel> GetMessagesByChatRoomId(string chatRoomId)
@@ -147,18 +149,58 @@ public class MessageServiceImpl(
         };
 
         messageRepository.Add(forwardedMessage);
+        
         return forwardedMessage;
     }
 
-    public Message PinMessage(string messageId)
+    public Message? PinMessage(string messageId)
     {
-        Message message = messageRepository.GetMessageById(messageId);
+        Message? message = messageRepository.GetMessageById(messageId);
         if (message == null)
             return null;
-
+        
+        Message? pinMessage = messageRepository.GetPinMessageByChatRoomId(message.ChatRoomId);
+        if (pinMessage != null)
+        {
+            pinMessage.IsPinned = false;
+            messageRepository.Update(pinMessage);
+        }
+        
         message.IsPinned = true;
         
         messageRepository.Update(message);
+        
         return message;
+    }
+    
+    public Message? UnsentMessage(string messageId, string currentUserId)
+    {
+        Message? message = messageRepository.GetMessageById(messageId);
+        
+        if (message == null)
+            return null;
+
+        if (message.FromUserId != currentUserId)
+            return null;
+        
+        message.IsUnsent = true;
+        
+        messageRepository.Update(message);
+        
+        return message;
+    }
+
+    public Boolean DeleteMessage(string messageId, string currentUserId)
+    {
+        DeleteMessageUser message = new DeleteMessageUser()
+        {
+            Id = Guid.NewGuid().ToString(),
+            MessageId = messageId,
+            UserId = currentUserId
+        };
+        
+        deleteMessageUserRepository.Add(message);
+        
+        return true;
     }
 }

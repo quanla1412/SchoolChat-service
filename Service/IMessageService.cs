@@ -11,5 +11,7 @@ public interface IMessageService
     void MarkReadMessageByChatRoomId(string chatRoomId, string userId);
     MessageViewModel Add(CreateMessageViewModel message);
     Message ForwardMessage(ForwardMessageModel message);
-    Message PinMessage(string messageId);
+    Message? PinMessage(string messageId);
+    Message? UnsentMessage(string messageId, string currentUserId);
+    Boolean DeleteMessage(string messageId, string currentUserId);
 }

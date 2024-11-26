@@ -51,4 +51,41 @@ public class MessageController(UserManager<User> userManager, IMessageService me
             return NotFound(ex.Message);
         }
     }
+    
+    [HttpGet("Unsent")]
+    public ActionResult<Message> UnsentMessage([FromQuery] string messageId)
+    {
+        try
+        {
+            string currentUserId = userManager.GetUserId(User);
+            var unsentMessage = messageService.UnsentMessage(messageId, currentUserId);
+            return Ok(unsentMessage);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+    
+    [HttpPost("Delete")]
+    public ActionResult<Boolean> DeleteMessage([FromBody] string messageId)
+    {
+        try
+        {
+            string currentUserId = userManager.GetUserId(User);
+            var isDeleted = messageService.DeleteMessage(messageId, currentUserId);
+            if (isDeleted)
+            {
+                return Ok(true);
+            }
+            else
+            {
+                return NotFound("Message not found");
+            }
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
 }

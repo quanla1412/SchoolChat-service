@@ -42,4 +42,11 @@ public class MessageRepositoryImpl(ChatDbContext context) : IMessageRepository
         context.Messages.Update(message);
         context.SaveChanges();
     }
+
+    public Message? GetPinMessageByChatRoomId(string chatRoomId)
+    {
+        return context.Messages
+            .Include(message => message.ReadStatuses)
+            .FirstOrDefault(message => message.ChatRoomId == chatRoomId && message.IsPinned == true);
+    }
 }
