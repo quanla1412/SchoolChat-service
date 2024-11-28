@@ -13,6 +13,7 @@ public interface IMessageService
     MessageViewModel Add(CreateMessageViewModel message);
     Message ForwardMessage(ForwardMessageModel message);
     PinnedMessageViewModel? PinMessage(string messageId);
-    Message? UnsentMessage(string messageId, string currentUserId);
+    void UnpinMessage(string messageId);
+    bool UnsentMessage(string messageId);
     Boolean DeleteMessage(string messageId, string currentUserId);
 }

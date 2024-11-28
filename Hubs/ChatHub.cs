@@ -56,4 +56,37 @@ public class ChatHub(SharedDb shared, IMessageService messageService) : Hub
                 .SendAsync("NewPinnedMessage", pinnedMessage);
         }
     }
+    
+    public async Task UnpinMessage(string messageId)
+    {
+        if (shared.connections.TryGetValue(Context.ConnectionId, out UserConnection conn))
+        {
+            messageService.UnpinMessage(messageId);
+            
+            await Clients.Group(conn.ChatRoomId)
+                .SendAsync("UnpinMessage");
+        }
+    }
+    
+    public async Task UnsentMessage(string messageId)
+    {
+        if (shared.connections.TryGetValue(Context.ConnectionId, out UserConnection conn))
+        {
+            messageService.UnsentMessage(messageId);
+            
+            await Clients.Group(conn.ChatRoomId)
+                .SendAsync("UnsentMessage", messageId);
+        }
+    }
+    
+    public async Task DeleteMessage(string messageId)
+    {
+        if (shared.connections.TryGetValue(Context.ConnectionId, out UserConnection conn))
+        {
+            bool isDeleted = messageService.DeleteMessage(messageId, conn.UserId);
+            if (isDeleted)
+                await Clients.Group(conn.ChatRoomId)
+                    .SendAsync("DeleteMessage", messageId);
+        }
+    }
 }

@@ -56,16 +56,8 @@ public class MessageController(UserManager<User> userManager, IMessageService me
     [HttpGet("Unsent")]
     public ActionResult<Message> UnsentMessage([FromQuery] string messageId)
     {
-        try
-        {
-            string currentUserId = userManager.GetUserId(User);
-            var unsentMessage = messageService.UnsentMessage(messageId, currentUserId);
-            return Ok(unsentMessage);
-        }
-        catch (Exception ex)
-        {
-            return NotFound(ex.Message);
-        }
+        bool success = messageService.UnsentMessage(messageId);
+        return success ? Ok() : NotFound();
     }
     
     [HttpPost("Delete")]

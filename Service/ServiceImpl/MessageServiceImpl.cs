@@ -35,7 +35,9 @@ public class MessageServiceImpl(
                 ChatRoomId = message.ChatRoomId,
                 FromUserId = message.FromUserId,
                 SentDate = message.SentDate,
-                Text = message.Text,
+                Text = !message.IsUnsent ? message.Text : "Tin nhắn đã được thu hồi",
+                IsPinned = message.IsPinned,
+                IsUnsent = message.IsUnsent,
                 ReadStatuses = readStatusViewModels
             });
         });
@@ -210,22 +212,29 @@ public class MessageServiceImpl(
             Text = message.Text
         };
     }
-    
-    public Message? UnsentMessage(string messageId, string currentUserId)
+
+    public void UnpinMessage(string messageId)
+    {
+        Message? message = messageRepository.GetMessageById(messageId);
+        if (message == null)
+            return;
+        message.IsPinned = false;
+        
+        messageRepository.Update(message);
+    }
+
+    public bool UnsentMessage(string messageId)
     {
         Message? message = messageRepository.GetMessageById(messageId);
         
         if (message == null)
-            return null;
-
-        if (message.FromUserId != currentUserId)
-            return null;
+            return false;
         
         message.IsUnsent = true;
         
         messageRepository.Update(message);
         
-        return message;
+        return true;
     }
 
     public Boolean DeleteMessage(string messageId, string currentUserId)
