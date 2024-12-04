@@ -51,12 +51,15 @@ builder.Services.AddSingleton<SharedDb>();
 builder.Services.AddScoped<IUserService, UserServiceImpl>();
 builder.Services.AddScoped<IChatRoomService, ChatRoomServiceImpl>();
 builder.Services.AddScoped<IMessageService, MessageServiceImpl>();
+builder.Services.AddScoped<IUserTaskService, UserTaskServiceImpl>();
 
 builder.Services.AddScoped<IUserRepository, UserRepositoryImpl>();
 builder.Services.AddScoped<IChatRoomRepository, ChatRoomRepositoryImpl>();
 builder.Services.AddScoped<IMessageRepository, MessageRepositoryImpl>();
 builder.Services.AddScoped<IReadMessageStatusRepository, ReadMessageStatusRepositoryImpl>();
 builder.Services.AddScoped<IDeleteMessageUserRepository, DeleteMessageUserRepositoryImpl>();
+builder.Services.AddScoped<IUserTaskRepository, UserTaskRepositoryImpl>();
+builder.Services.AddScoped<ITaskAssigneeRepository, TaskAssigneeRepositoryImpl>();
 
 var app = builder.Build();
 
