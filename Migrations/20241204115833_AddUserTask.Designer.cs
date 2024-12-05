@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchoolChat.Service;
 
@@ -11,9 +12,11 @@ using SchoolChat.Service;
 namespace SchoolChat.Service.Migrations
 {
     [DbContext(typeof(ChatDbContext))]
-    partial class ChatDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241204115833_AddUserTask")]
+    partial class AddUserTask
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -204,53 +207,6 @@ namespace SchoolChat.Service.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("DeleteMessageUsers");
-                });
-
-            modelBuilder.Entity("SchoolChat.Service.Models.Event", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ChatRoomId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Events");
-                });
-
-            modelBuilder.Entity("SchoolChat.Service.Models.EventUser", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("EventId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EventId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("EventUsers");
                 });
 
             modelBuilder.Entity("SchoolChat.Service.Models.Message", b =>
@@ -498,21 +454,6 @@ namespace SchoolChat.Service.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SchoolChat.Service.Models.EventUser", b =>
-                {
-                    b.HasOne("SchoolChat.Service.Models.Event", null)
-                        .WithMany("Users")
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SchoolChat.Service.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("SchoolChat.Service.Models.ReadMessageStatus", b =>
                 {
                     b.HasOne("SchoolChat.Service.Models.Message", null)
@@ -523,11 +464,6 @@ namespace SchoolChat.Service.Migrations
                 });
 
             modelBuilder.Entity("SchoolChat.Service.Models.ChatRoom", b =>
-                {
-                    b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("SchoolChat.Service.Models.Event", b =>
                 {
                     b.Navigation("Users");
                 });
