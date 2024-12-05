@@ -13,6 +13,8 @@ public class ChatDbContext : IdentityDbContext<User>
     public DbSet<ReadMessageStatus> ReadMessageStatuses { get; set; }
     public DbSet<UserTask> UserTasks { get; set; }
     public DbSet<TaskAssignee> TaskAssignees { get; set; }
+    public DbSet<Event> Events { get; set; }
+    public DbSet<EventUser> EventUsers { get; set; }
 
     public ChatDbContext(DbContextOptions<ChatDbContext> options) : base(options)
     {

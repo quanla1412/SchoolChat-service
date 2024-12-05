@@ -10,6 +10,14 @@ public class ChatRoomServiceImpl(
     IMessageService messageService
     ) : IChatRoomService
 {
+    private string GetChatRoomName(ChatRoom chatRoom, List<UserViewModel> users, string currentUserId)
+    {
+        if (chatRoom.Name != null)
+            return chatRoom.Name;
+        
+        List<UserViewModel> filteredUsers = users.Where(u => u.Id != currentUserId).ToList();
+        return string.Join(", ", filteredUsers.Select(user => user.Name ?? user.Email).ToList());
+    }
     public List<ChatRoomViewModel> GetChatRoomsByUserId(string userId)
     {
         List<ChatRoomViewModel> result = new();
@@ -34,7 +42,7 @@ public class ChatRoomServiceImpl(
             result.Add(new ChatRoomViewModel()
             {
                 Id = chatRoom.Id,
-                Name = chatRoom.Name,
+                Name = GetChatRoomName(chatRoom, users, userId),
                 Users = users,
                 NewestMessage = messageService.GetNewestMessagesByChatRoomId(chatRoom.Id)
             });
@@ -43,19 +51,32 @@ public class ChatRoomServiceImpl(
         return result;
     }
 
-    public ChatRoomDetailViewModel? GetChatRoomById(string id)
+    public ChatRoomDetailViewModel? GetChatRoomDetailById(string id, string currentUserId)
     {
         ChatRoom? chatRoom = chatRoomRepository.GetChatRoomById(id);
         if (chatRoom == null)
         {
             return null;
         }
-
+        
+        List<ShortUserViewModel> users = new();
+        foreach (var chatRoomUser in chatRoom.Users)
+        {
+            User user = chatRoomUser.User;
+            if(user.Id != currentUserId)
+                users.Add(new ShortUserViewModel()
+                {
+                    Id = user.Id,
+                    Name = user.Name ?? user.Email
+                });
+        }
+        
         return new ChatRoomDetailViewModel()
         {
             Id = chatRoom.Id,
             Name = chatRoom.Name,
-            PinnedMessage = messageService.GetPinnedMessagesByChatRoomId(chatRoom.Id)
+            PinnedMessage = messageService.GetPinnedMessagesByChatRoomId(chatRoom.Id),
+            Users = users
         };
     }
 

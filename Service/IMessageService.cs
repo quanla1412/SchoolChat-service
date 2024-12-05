@@ -11,7 +11,7 @@ public interface IMessageService
     ReadMessageStatusViewModel MarkReadMessage(string messageId, string userId);
     void MarkReadMessageByChatRoomId(string chatRoomId, string userId);
     MessageViewModel Add(CreateMessageViewModel message);
-    Message ForwardMessage(ForwardMessageModel message);
+    MessageViewModel? ForwardMessage(ForwardMessageModel message, string currentUserId);
     PinnedMessageViewModel? PinMessage(string messageId);
     void UnpinMessage(string messageId);
     bool UnsentMessage(string messageId);

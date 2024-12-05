@@ -24,7 +24,8 @@ public class ChatRoomController(UserManager<User> userManager, IChatRoomService 
     [ActionName("Detail")]
     public ChatRoomDetailViewModel GetChatRooms([FromQuery] string id)
     {
-        ChatRoomDetailViewModel result = chatRoomService.GetChatRoomById(id);
+        string currentUserId = userManager.GetUserId(User);
+        ChatRoomDetailViewModel result = chatRoomService.GetChatRoomDetailById(id, currentUserId);
 
         return result;
     }

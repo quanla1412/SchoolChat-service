@@ -26,6 +26,19 @@ public class UserRepositoryImpl : IUserRepository
         return query.ToList();
     }
 
+    public List<User> GetUsersByChatRoomId(string chatRoomId)
+    {   var userIds = _context.ChatRoomUsers
+            .Where(chatRoomUser => chatRoomUser.ChatRoomId == chatRoomId)
+            .Select(chatRoomUser => chatRoomUser.User.Id)
+            .ToList();
+
+        var result = _context.Users
+            .Where(user => userIds.Contains(user.Id))
+            .ToList();
+
+        return result;
+    }
+
     public User UpdateProfile(User user)
     {
         var existingUser = _context.Users.Find(user.Id);

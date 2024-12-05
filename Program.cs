@@ -52,6 +52,7 @@ builder.Services.AddScoped<IUserService, UserServiceImpl>();
 builder.Services.AddScoped<IChatRoomService, ChatRoomServiceImpl>();
 builder.Services.AddScoped<IMessageService, MessageServiceImpl>();
 builder.Services.AddScoped<IUserTaskService, UserTaskServiceImpl>();
+builder.Services.AddScoped<IEventService, EventServiceImpl>();
 
 builder.Services.AddScoped<IUserRepository, UserRepositoryImpl>();
 builder.Services.AddScoped<IChatRoomRepository, ChatRoomRepositoryImpl>();
@@ -60,6 +61,7 @@ builder.Services.AddScoped<IReadMessageStatusRepository, ReadMessageStatusReposi
 builder.Services.AddScoped<IDeleteMessageUserRepository, DeleteMessageUserRepositoryImpl>();
 builder.Services.AddScoped<IUserTaskRepository, UserTaskRepositoryImpl>();
 builder.Services.AddScoped<ITaskAssigneeRepository, TaskAssigneeRepositoryImpl>();
+builder.Services.AddScoped<IEventRepository, EventRepositoryImpl>();
 
 var app = builder.Build();
 
