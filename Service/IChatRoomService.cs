@@ -5,6 +5,6 @@ namespace SchoolChat.Service.Service;
 public interface IChatRoomService
 {
     List<ChatRoomViewModel> GetChatRoomsByUserId(string userId);
-    ChatRoomDetailViewModel? GetChatRoomById(string id);
+    ChatRoomDetailViewModel? GetChatRoomDetailById(string id, string currentUserId);
     ChatRoomViewModel CreateChatRoom(CreateChatRoomViewModel model);
 }

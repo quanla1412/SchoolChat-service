@@ -29,7 +29,8 @@ public class MessageController(UserManager<User> userManager, IMessageService me
     {
         try
         {
-            var forwardedMessage = messageService.ForwardMessage(model);
+            string currentUserId = userManager.GetUserId(User);
+            var forwardedMessage = messageService.ForwardMessage(model, currentUserId);
             return Ok(forwardedMessage);
         }
         catch (Exception ex)

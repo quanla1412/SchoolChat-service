@@ -8,5 +8,7 @@ public interface IUserRepository
   
     List<User> GetUsers(string searchString, string? excludeUserId);
   
+    List<User> GetUsersByChatRoomId(string chatRoomId);
+  
     User UpdateProfile(User user);
 }

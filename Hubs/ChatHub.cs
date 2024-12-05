@@ -89,4 +89,21 @@ public class ChatHub(SharedDb shared, IMessageService messageService) : Hub
                     .SendAsync("DeleteMessage", messageId);
         }
     }
+    
+    public async Task ForwardMessage(ForwardMessageModel model)
+    {
+        if (shared.connections.TryGetValue(Context.ConnectionId, out UserConnection conn))
+        {
+            try
+            {
+                var forwardedMessage = messageService.ForwardMessage(model, conn.UserId);
+                await Clients.Group(model.ChatRoomId)
+                    .SendAsync("ReceiveMessage", forwardedMessage);
+            }
+            catch (Exception ex)
+            {
+                await Console.Error.WriteLineAsync(ex.Message);
+            }
+        }
+    }
 }

@@ -11,6 +11,8 @@ public class ChatDbContext : IdentityDbContext<User>
     public DbSet<Message> Messages { get; set; }
     public DbSet<DeleteMessageUser> DeleteMessageUsers { get; set; }
     public DbSet<ReadMessageStatus> ReadMessageStatuses { get; set; }
+    public DbSet<Event> Events { get; set; }
+    public DbSet<EventUser> EventUsers { get; set; }
 
     public ChatDbContext(DbContextOptions<ChatDbContext> options) : base(options)
     {

@@ -7,7 +7,9 @@ public class ChatRoomRepositoryImpl(ChatDbContext context) : IChatRoomRepository
 {
     public ChatRoom? GetChatRoomById(string id)
     {
-        return context.ChatRooms.FirstOrDefault(room => room.Id == id);
+        return context.ChatRooms.Include(chatRoom => chatRoom.Users)
+            .ThenInclude(charRoomUser => charRoomUser.User)
+            .FirstOrDefault(room => room.Id == id);
     }
 
     public List<ChatRoom> GetChatRoomsByUserId(string userId)

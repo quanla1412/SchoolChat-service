@@ -28,16 +28,23 @@ public class MessageServiceImpl(
                     UserId = readStatus.UserId,
                     ReadDate = readStatus.ReadDate
                 }));
+            
+            User? user = userRepository.GetUserById(message.FromUserId);
                 
             result.Add(new MessageViewModel()
             {
                 Id = message.Id,
                 ChatRoomId = message.ChatRoomId,
-                FromUserId = message.FromUserId,
+                FromUser = new()
+                {
+                    Id = message.FromUserId,
+                    Name = user?.Name ?? user?.Email
+                },
                 SentDate = message.SentDate,
                 Text = !message.IsUnsent ? message.Text : "Tin nhắn đã được thu hồi",
                 IsPinned = message.IsPinned,
                 IsUnsent = message.IsUnsent,
+                IsForwarded = message.IsForwarded,
                 ReadStatuses = readStatusViewModels
             });
         });
@@ -64,7 +71,10 @@ public class MessageServiceImpl(
         {
             Id = message.Id,
             ChatRoomId = message.ChatRoomId,
-            FromUserId = message.FromUserId,
+            FromUser = new()
+            {
+                Id = message.FromUserId
+            },
             SentDate = message.SentDate,
             Text = message.Text,
             ReadStatuses = readStatusViewModels
@@ -147,15 +157,18 @@ public class MessageServiceImpl(
         {
             Id = message.Id,
             ChatRoomId = createModel.ChatRoomId,
-            FromUserId = message.FromUserId,
+            FromUser = new ShortUserViewModel()
+            {
+                Id = message.FromUserId
+            },
             Text = message.Text,
             SentDate = message.SentDate
         };
     }
     
-    public Message ForwardMessage(ForwardMessageModel model)
+    public MessageViewModel? ForwardMessage(ForwardMessageModel model, string currentUserId)
     {
-        Message message = messageRepository.GetMessageById(model.MessageId);
+        Message? message = messageRepository.GetMessageById(model.MessageId);
         if (message == null)
             return null;
 
@@ -163,7 +176,7 @@ public class MessageServiceImpl(
         {
             Id = Guid.NewGuid().ToString(),
             ChatRoomId = model.ChatRoomId,
-            FromUserId = message.FromUserId,
+            FromUserId = currentUserId,
             Text = message.Text,
             SentDate = DateTime.UtcNow,
             ReadStatuses = new List<ReadMessageStatus>(),
@@ -173,7 +186,18 @@ public class MessageServiceImpl(
 
         messageRepository.Add(forwardedMessage);
         
-        return forwardedMessage;
+        return new MessageViewModel()
+        {
+            Id = message.Id,
+            ChatRoomId = model.ChatRoomId,
+            FromUser = new ShortUserViewModel()
+            {
+                Id = message.FromUserId
+            },
+            Text = message.Text,
+            SentDate = message.SentDate,
+            IsForwarded = true
+        };
     }
 
     public PinnedMessageViewModel? PinMessage(string messageId)
