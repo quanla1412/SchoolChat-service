@@ -26,7 +26,7 @@ public class UserController(UserManager<User> userManager, IUserService userServ
 
     [HttpPost]
     [ActionName("UpdateProfile")]
-    public IActionResult UpdateProfile(UpdateProfileViewModel profileViewModel)
+    public IActionResult UpdateProfile([FromForm] UpdateProfileViewModel profileViewModel)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.IdentityModel.Tokens;
 using SchoolChat.Service.Models;
 using SchoolChat.Service.Repository;
 using SchoolChat.Service.ViewModel;
@@ -22,7 +23,8 @@ public class UserServiceImpl(IUserRepository userRepository) : IUserService
             UserName = user.UserName,
             Gender = user.Gender,
             Birthday = user.Birthday,
-            Phone = user.PhoneNumber
+            Phone = user.PhoneNumber,
+            Avatar = user.Avatar,
         };
     }
 
@@ -45,12 +47,24 @@ public class UserServiceImpl(IUserRepository userRepository) : IUserService
         return usersViewModel;
     }
 
+    public List<string> GetUserIdsByChatRoom(string chatRoomId)
+    {
+        List<User> users = userRepository.GetUsersByChatRoomId(chatRoomId);
+        return users.Select(u => u.Id).ToList();
+    }
+
     public UpdateProfileViewModel UpdateProfile(UpdateProfileViewModel model)
     {
         User user = userRepository.GetUserById(model.Id);
         
         if (user == null)
             throw new KeyNotFoundException("User not found.");
+
+        if (!model.AvatarFiles.IsNullOrEmpty() && model.AvatarFiles?[0] != null)
+        {
+            Task<string?> avatarPath = SaveAvatar(model.AvatarFiles[0]);
+            user.Avatar = avatarPath.Result;
+        }
         
         user.Name = model.Name;
         user.Birthday = model.Birthday;
@@ -67,5 +81,21 @@ public class UserServiceImpl(IUserRepository userRepository) : IUserService
             Gender = user.Gender,
             Phone = user.PhoneNumber
         };
+    }
+
+    private async Task<string?> SaveAvatar(IFormFile file)
+    {
+        string baseDirectory = Path.Combine("D:/Study/DotNet/Images");
+        if (file.Length > 0) {
+            string filePath = Path.Combine(baseDirectory, file.FileName);
+            using (Stream fileStream = new FileStream(filePath, FileMode.Create)) {
+                await file.CopyToAsync(fileStream);
+            }
+        }
+        else
+        {
+            return null;
+        }
+        return file.FileName;
     }
 }

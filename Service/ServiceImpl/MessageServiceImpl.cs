@@ -162,7 +162,8 @@ public class MessageServiceImpl(
                 Id = message.FromUserId
             },
             Text = message.Text,
-            SentDate = message.SentDate
+            SentDate = message.SentDate,
+            ReadStatuses = new List<ReadMessageStatusViewModel>()
         };
     }
     

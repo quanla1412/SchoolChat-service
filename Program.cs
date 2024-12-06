@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using SchoolChat.Service;
 using SchoolChat.Service.DataService;
 using SchoolChat.Service.Hubs;
@@ -83,6 +84,13 @@ app.MapHub<ChatHub>("/Chat");
 app.UseCors("reactApp");
 
 app.MapIdentityApi<User>();
+
+app.UseStaticFiles();    //Serve files from wwwroot
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider("D:/Study/DotNet/Images"),
+    RequestPath = "/Images"
+});
 
 app.Run();
 

@@ -9,4 +9,5 @@ public class UserViewModel
     public string? Gender { get; set; }
     public DateTime? Birthday { get; set; }
     public string? Phone { get; set; }
+    public string? Avatar { get; set; }
 }

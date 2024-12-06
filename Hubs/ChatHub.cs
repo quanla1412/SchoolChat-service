@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.SignalR;
 using SchoolChat.Service.DataService;
 using SchoolChat.Service.Models;
+using SchoolChat.Service.Service;
 using SchoolChat.Service.Service.ServiceImpl;
 using SchoolChat.Service.ViewModel;
 using Hub = Microsoft.AspNetCore.SignalR.Hub;
@@ -9,24 +10,51 @@ using Hub = Microsoft.AspNetCore.SignalR.Hub;
 namespace SchoolChat.Service.Hubs;
 
 [Authorize]
-public class ChatHub(SharedDb shared, IMessageService messageService) : Hub
+public class ChatHub(
+    SharedDb shared, 
+    IMessageService messageService,
+    IUserService userService
+    ) : Hub
 {
-    public async Task JoinChat(UserConnection conn)
+    public override Task OnConnectedAsync()
     {
-        await Clients.All
-            .SendAsync("ReceiveMessage", "admin", $"{conn.Username} has joined!");
+        Console.WriteLine($"User {Context.User?.Identity?.Name} connected.");
+        return base.OnConnectedAsync();
     }
 
-    public async Task JoinSpecificChatRoom(UserConnection conn)
+    public override Task OnDisconnectedAsync(Exception? exception)
     {
-        await Groups.AddToGroupAsync(Context.ConnectionId, conn.ChatRoomId);
-        
+        if (shared.connections.Remove(Context.ConnectionId, out UserConnection conn))
+        {
+            Clients.AllExcept(Context.ConnectionId)
+                .SendAsync("NewUserOfflineListener", conn.UserId);
+        }
+        return base.OnDisconnectedAsync(exception);
+    }
+
+    public async Task ConnectToHub(UserConnection conn)
+    {
         shared.connections[Context.ConnectionId] = conn;
+        await Clients.AllExcept(Context.ConnectionId)
+            .SendAsync("NewUserOnlineListener", conn.UserId);
         
-        messageService.MarkReadMessageByChatRoomId(conn.ChatRoomId, conn.UserId);
+        List<string> onlineUserIds = shared.connections.Values.Select(connection => connection.UserId).ToList();
+        await Clients.Client(Context.ConnectionId)
+            .SendAsync("OnlineUserIds", onlineUserIds);
+    }
+
+    public async Task JoinSpecificChatRoom(string chatRoomId)
+    {
+        if (shared.connections.TryGetValue(Context.ConnectionId, out UserConnection conn))
+        {
+            conn.ChatRoomId = chatRoomId;
+            await Groups.AddToGroupAsync(Context.ConnectionId, conn.ChatRoomId);
         
-        await Clients.Group(conn.ChatRoomId)
-            .SendAsync("JoinSpecificChatRoom", "admin", $"{conn.UserId} has joined {conn.ChatRoomId}");
+            messageService.MarkReadMessageByChatRoomId(conn.ChatRoomId, conn.UserId);
+        
+            await Clients.Group(conn.ChatRoomId)
+                .SendAsync("JoinSpecificChatRoom", "admin", $"{conn.UserId} has joined {conn.ChatRoomId}");
+        }
     }
 
     public async Task SendMessage(string msg)
@@ -42,6 +70,19 @@ public class ChatHub(SharedDb shared, IMessageService messageService) : Hub
             MessageViewModel message = messageService.Add(createMessageViewModel);
             
             await Clients.Group(conn.ChatRoomId)
+                .SendAsync("ReceiveMessage", message);
+            
+            //Broadcast to all user in chatroom to update list chatroom
+            List<string> chatRoomUserIds = userService.GetUserIdsByChatRoom(conn.ChatRoomId);
+            List<string> connectionIds = new List<string>();
+            foreach (var key in shared.connections.Keys)
+            {
+                if (shared.connections.TryGetValue(key, out UserConnection c) && chatRoomUserIds.Contains(c.UserId) && c.UserId != conn.UserId)
+                {
+                    connectionIds.Add(key);
+                }
+            }
+            await Clients.Clients(connectionIds)
                 .SendAsync("ReceiveMessage", message);
         }
     }
