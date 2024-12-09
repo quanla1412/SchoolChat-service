@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SchoolChat.Service.Models;
-using SchoolChat.Service.Service.ServiceImpl;
+using SchoolChat.Service.Service;
 using SchoolChat.Service.ViewModel;
 
 namespace SchoolChat.Service.Controllers;
@@ -81,5 +81,18 @@ public class MessageController(UserManager<User> userManager, IMessageService me
         {
             return StatusCode(500, ex.Message);
         }
+    }
+    
+    [HttpPost]
+    [ActionName("UploadFile")]
+    public IActionResult UploadFile([FromForm] UploadImageViewModel model)
+    {
+        List<IFormFile> files = model.Files;
+        if (files.Count == 0)
+            return BadRequest("No file uploaded");
+        string? filePath = messageService.UploadFile(files[0]);
+        if (filePath == null)
+            return BadRequest();
+        return Ok(filePath);
     }
 }

@@ -11,4 +11,8 @@ public interface IChatRoomRepository
     ChatRoom? GetChatRoomByUsers(string fromUserId, List<string> toUserIds);
     
     void Add(ChatRoom chatRoom);
+    
+    void Update(ChatRoom chatRoom);
+
+    void AddChatRoomUser(List<ChatRoomUser> chatRoomUsers);
 }

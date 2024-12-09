@@ -36,4 +36,16 @@ public class ChatRoomRepositoryImpl(ChatDbContext context) : IChatRoomRepository
         context.ChatRooms.Add(chatRoom);
         context.SaveChanges();
     }
+
+    public void Update(ChatRoom chatRoom)
+    {
+        context.ChatRooms.Update(chatRoom);
+        context.SaveChanges();
+    }
+
+    public void AddChatRoomUser(List<ChatRoomUser> chatRoomUsers)
+    {
+        context.ChatRoomUsers.AddRange(chatRoomUsers);
+        context.SaveChanges();
+    }
 }

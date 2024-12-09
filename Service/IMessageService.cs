@@ -1,7 +1,7 @@
 ﻿using SchoolChat.Service.Models;
 using SchoolChat.Service.ViewModel;
 
-namespace SchoolChat.Service.Service.ServiceImpl;
+namespace SchoolChat.Service.Service;
 
 public interface IMessageService
 {
@@ -16,4 +16,5 @@ public interface IMessageService
     void UnpinMessage(string messageId);
     bool UnsentMessage(string messageId);
     Boolean DeleteMessage(string messageId, string currentUserId);
+    string? UploadFile(IFormFile file);
 }

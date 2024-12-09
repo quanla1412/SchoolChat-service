@@ -19,9 +19,9 @@ public class UserController(UserManager<User> userManager, IUserService userServ
     
     [HttpGet]
     [ActionName("GetUsers")]
-    public IEnumerable<UserViewModel> GetUsers([FromQuery] string searchString = "", [FromQuery] bool excludeCurrentUser = false)
+    public IEnumerable<UserViewModel> GetUsers([FromQuery] string searchString = "", [FromQuery] bool excludeCurrentUser = false, [FromQuery] string exceptChatRoomId = "")
     {
-        return userService.GetUsers(searchString, excludeCurrentUser ? userManager.GetUserId(User) : null);
+        return userService.GetUsers(searchString, excludeCurrentUser ? userManager.GetUserId(User) : null, exceptChatRoomId);
     }
 
     [HttpPost]

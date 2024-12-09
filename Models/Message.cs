@@ -11,4 +11,5 @@ public class Message
     public Boolean IsForwarded { get; set; }
     public Boolean IsPinned { get; set; }
     public Boolean IsUnsent { get; set; }
+    public string? Type { get; set; }
 }

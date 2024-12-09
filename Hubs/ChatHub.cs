@@ -57,7 +57,7 @@ public class ChatHub(
         }
     }
 
-    public async Task SendMessage(string msg)
+    public async Task SendMessage(SendMessageModel model)
     {
         if (shared.connections.TryGetValue(Context.ConnectionId, out UserConnection conn))
         {
@@ -65,7 +65,8 @@ public class ChatHub(
             {
                 ChatRoomId = conn.ChatRoomId,
                 FromUserId = conn.UserId,
-                Text = msg
+                Text = model.Message,
+                Type = model.Type
             };
             MessageViewModel message = messageService.Add(createMessageViewModel);
             

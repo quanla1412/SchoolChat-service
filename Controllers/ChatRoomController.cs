@@ -22,7 +22,7 @@ public class ChatRoomController(UserManager<User> userManager, IChatRoomService 
     
     [HttpGet]
     [ActionName("Detail")]
-    public ChatRoomDetailViewModel GetChatRooms([FromQuery] string id)
+    public ChatRoomDetailViewModel GetChatRoomDetail([FromQuery] string id)
     {
         string currentUserId = userManager.GetUserId(User);
         ChatRoomDetailViewModel result = chatRoomService.GetChatRoomDetailById(id, currentUserId);
@@ -37,6 +37,22 @@ public class ChatRoomController(UserManager<User> userManager, IChatRoomService 
         model.FromUserId = userManager.GetUserId(User);
         ChatRoomViewModel result = chatRoomService.CreateChatRoom(model);
         
+        return Ok(result);
+    }
+
+    [HttpPost]
+    [ActionName("Update")]
+    public IActionResult Update([FromForm] UpdateChatRoomVIewModel model)
+    {
+        ChatRoomViewModel result = chatRoomService.Update(model);
+        return Ok(result);
+    }
+    
+    [HttpPost]
+    [ActionName("AddUserToChatRoom")]
+    public IActionResult AddUserToChatRoom([FromForm] AddUserToChatRoomModel model)
+    {
+        List<ShortUserViewModel> result = chatRoomService.AddUserToChatRoom(model);
         return Ok(result);
     }
 }

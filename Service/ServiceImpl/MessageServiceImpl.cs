@@ -45,6 +45,7 @@ public class MessageServiceImpl(
                 IsPinned = message.IsPinned,
                 IsUnsent = message.IsUnsent,
                 IsForwarded = message.IsForwarded,
+                Type = message.Type,
                 ReadStatuses = readStatusViewModels
             });
         });
@@ -77,6 +78,7 @@ public class MessageServiceImpl(
             },
             SentDate = message.SentDate,
             Text = message.Text,
+            Type = message.Type,
             ReadStatuses = readStatusViewModels
         };
     }
@@ -148,6 +150,7 @@ public class MessageServiceImpl(
             ChatRoomId = createModel.ChatRoomId,
             FromUserId = createModel.FromUserId,
             Text = createModel.Text,
+            Type = createModel.Type,
             SentDate = DateTime.Now
         };
         
@@ -162,6 +165,7 @@ public class MessageServiceImpl(
                 Id = message.FromUserId
             },
             Text = message.Text,
+            Type = message.Type,
             SentDate = message.SentDate,
             ReadStatuses = new List<ReadMessageStatusViewModel>()
         };
@@ -274,5 +278,18 @@ public class MessageServiceImpl(
         deleteMessageUserRepository.Add(message);
         
         return true;
+    }
+
+    public string? UploadFile(IFormFile file)
+    {
+        string baseDirectory = Path.Combine("D:/Study/DotNet/Images/Messages");
+        string? newFileName = null;
+        
+        newFileName = DateTime.Now.ToFileTime().ToString() + file.FileName;
+        string filePath = Path.Combine(baseDirectory, newFileName);
+        using (Stream fileStream = new FileStream(filePath, FileMode.Create)) {
+            file.CopyToAsync(fileStream);
+        }
+        return newFileName;
     }
 }

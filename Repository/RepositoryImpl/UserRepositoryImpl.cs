@@ -1,38 +1,38 @@
-﻿using SchoolChat.Service.Models;
+﻿using Microsoft.IdentityModel.Tokens;
+using SchoolChat.Service.Models;
 
 namespace SchoolChat.Service.Repository.RepositoryImpl;
 
-public class UserRepositoryImpl : IUserRepository
+public class UserRepositoryImpl(ChatDbContext context) : IUserRepository
 {
-    private readonly ChatDbContext _context;
-
-    public UserRepositoryImpl(ChatDbContext context)
-    {
-        _context = context;
-    }
-
     public User? GetUserById(string id)
     {
-        return _context.Users.SingleOrDefault(u => u.Id == id);
+        return context.Users.SingleOrDefault(u => u.Id == id);
     }
 
-    public List<User> GetUsers(string searchString, string? excludeUserId )
+    public List<User> GetUsers(string searchString, string? excludeUserId, string exceptChatRoomId)
     {
-        var query = _context.Users.Where(user => user.Email.Contains(searchString));
+        var query = context.Users.Where(user => user.Email.Contains(searchString) || user.Name.Contains(searchString));
         if (excludeUserId != null)
         {
             query = query.Where(user => user.Id != excludeUserId);
+        }
+
+        if (!exceptChatRoomId.IsNullOrEmpty())
+        {
+            List<string> userIdInChatroom = context.ChatRoomUsers.Where(chatRoomUser => chatRoomUser.ChatRoomId == exceptChatRoomId).Select(user => user.User.Id).ToList();
+            query = query.Where(user => !userIdInChatroom.Contains(user.Id));
         }
         return query.ToList();
     }
 
     public List<User> GetUsersByChatRoomId(string chatRoomId)
-    {   var userIds = _context.ChatRoomUsers
+    {   var userIds = context.ChatRoomUsers
             .Where(chatRoomUser => chatRoomUser.ChatRoomId == chatRoomId)
             .Select(chatRoomUser => chatRoomUser.User.Id)
             .ToList();
 
-        var result = _context.Users
+        var result = context.Users
             .Where(user => userIds.Contains(user.Id))
             .ToList();
 
@@ -41,7 +41,7 @@ public class UserRepositoryImpl : IUserRepository
 
     public User UpdateProfile(User user)
     {
-        var existingUser = _context.Users.Find(user.Id);
+        var existingUser = context.Users.Find(user.Id);
         if (existingUser == null)
             throw new KeyNotFoundException("User not found.");
 
@@ -50,8 +50,8 @@ public class UserRepositoryImpl : IUserRepository
         existingUser.Gender = user.Gender;
         existingUser.PhoneNumber = user.PhoneNumber;
         
-        _context.Users.Update(existingUser);
-        _context.SaveChanges();
+        context.Users.Update(existingUser);
+        context.SaveChanges();
 
         return existingUser;
     }

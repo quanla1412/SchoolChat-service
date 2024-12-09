@@ -28,9 +28,23 @@ public class UserServiceImpl(IUserRepository userRepository) : IUserService
         };
     }
 
-    public List<UserViewModel> GetUsers(string searchString, string? excludeUserId)
+    public ShortUserViewModel? GetShortUserById(string id)
     {
-        List<User> users = userRepository.GetUsers(searchString, excludeUserId);
+        User? user = userRepository.GetUserById(id);
+
+        if (user == null)
+            return null;
+
+        return new ShortUserViewModel()
+        {
+            Id = user.Id,
+            Name = user.Name ?? user.Email
+        };
+    }
+
+    public List<UserViewModel> GetUsers(string searchString, string? excludeUserId, string exceptChatRoomId)
+    {
+        List<User> users = userRepository.GetUsers(searchString, excludeUserId, exceptChatRoomId);
         List<UserViewModel> usersViewModel = new List<UserViewModel>();
         
         foreach (User user in users)
@@ -39,7 +53,7 @@ public class UserServiceImpl(IUserRepository userRepository) : IUserService
             {
                 Id = user.Id,
                 Email = user.Email,
-                Name = user.Name,
+                Name = user.Name ?? user.Email,
                 UserName = user.UserName,
             });
         }

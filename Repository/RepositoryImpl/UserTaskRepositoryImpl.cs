@@ -13,7 +13,18 @@ public class UserTaskRepositoryImpl(ChatDbContext context) : IUserTaskRepository
     {
         return context.UserTasks.Where(task => task.ChatRoomId == roomId).ToList();
     }
-    
+
+    public List<UserTask> GetByCreatorId(string creatorId)
+    {
+        return context.UserTasks.Where(task => task.CreatorId == creatorId).ToList();
+    }
+
+    public List<UserTask> GetByAssignToUserId(string userId)
+    {
+        var taskIds = context.TaskAssignees.Where(taskAssignee => taskAssignee.UserId == userId).Select(taskAssignee => taskAssignee.TaskId).ToList();
+        return context.UserTasks.Where(task => taskIds.Contains(task.Id)).ToList();
+    }
+
     public void Add(UserTask task)
     {
         context.UserTasks.Add(task);

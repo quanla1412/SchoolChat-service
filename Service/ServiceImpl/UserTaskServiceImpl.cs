@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http.HttpResults;
 using SchoolChat.Service.Models;
 using SchoolChat.Service.Repository;
 using SchoolChat.Service.ViewModel;
@@ -8,7 +7,8 @@ namespace SchoolChat.Service.Service.ServiceImpl;
 public class UserTaskServiceImpl(
     IUserTaskRepository userTaskRepository,
     ITaskAssigneeRepository taskAssigneeRepository,
-    IUserRepository userRepository
+    IUserRepository userRepository,
+    IUserService userService
     ) : IUserTaskService
 {
     public List<UserTaskViewModel> GetByChatRoomId(string chatRoomId)
@@ -26,30 +26,93 @@ public class UserTaskServiceImpl(
                     return new UserViewModel
                     {
                         Id = user.Id,
+                        Name = user.Name ?? user.Email,
+                        Email = user.Email
+                    };
+                })
+                .ToList();
+            
+            ShortUserViewModel? creator = userService.GetShortUserById(task.CreatorId);
+            
+            var taskViewModel = new UserTaskViewModel
+            {
+                Id = task.Id,
+                Name = task.Name,
+                ChatRoomId = task.ChatRoomId,
+                CreatorId = task.CreatorId,
+                Description = task.Description,
+                Deadline = task.Deadline,
+                CreatedDate = task.CreatedDate,
+                IsCompleted = task.IsCompleted,
+                Creator = creator,
+                TaskAssignees = assigneeViewModels
+            };
+
+            taskViewModels.Add(taskViewModel);
+        }
+        taskViewModels.Sort((x, y) => x.Deadline.CompareTo(y.Deadline));
+        
+        return taskViewModels;
+    }
+
+    public List<UserTaskViewModel> GetByUserId(string userId)
+    {
+        List<UserTask> createdByMeTasks = userTaskRepository.GetByCreatorId(userId);
+        List<UserTask> assignToMeTasks = userTaskRepository.GetByAssignToUserId(userId);
+        
+        List<UserTaskViewModel> taskViewModels = new List<UserTaskViewModel>();
+        createdByMeTasks.ForEach(task => taskViewModels.Add(new UserTaskViewModel()
+        {
+            Id = task.Id,
+            Name = task.Name,
+            ChatRoomId = task.ChatRoomId,
+            CreatorId = task.CreatorId,
+            CreatedDate = task.CreatedDate,
+            Deadline = task.Deadline,
+            Description = task.Description,
+            IsCompleted = task.IsCompleted,
+            Creator = userService.GetShortUserById(task.CreatorId),
+            Type = "MINE"
+        }));
+        
+        assignToMeTasks.ForEach(task => taskViewModels.Add(new UserTaskViewModel()
+        {
+            Id = task.Id,
+            Name = task.Name,
+            ChatRoomId = task.ChatRoomId,
+            CreatorId = task.CreatorId,
+            CreatedDate = task.CreatedDate,
+            Deadline = task.Deadline,
+            Description = task.Description,
+            IsCompleted = task.IsCompleted,
+            Creator = userService.GetShortUserById(task.CreatorId),
+            Type = "ASSIGNED_BY_ME"
+        }));
+        
+        taskViewModels.Sort((x, y) => x.Deadline.CompareTo(y.Deadline));
+        
+        taskViewModels.ForEach(task =>
+        {
+            List<TaskAssignee> taskAssignees = taskAssigneeRepository.GetByTaskId(task.Id);
+            List<UserViewModel> assigneeViewModels = taskAssignees
+                .Select(ta => 
+                {
+                    var user = userRepository.GetUserById(ta.UserId);
+                    return new UserViewModel
+                    {
+                        Id = user.Id,
                         Name = user.Name,
                         Email = user.Email
                     };
                 })
                 .ToList();
             
-            var taskViewModel = new UserTaskViewModel
-            {
-                Id = task.Id,
-                ChatRoomId = task.ChatRoomId,
-                CreatorId = task.CreatorId,
-                Message = task.Message,
-                Deadline = task.Deadline,
-                CreatedAt = task.CreatedAt,
-                Status = task.Status,
-                TaskAssignees = assigneeViewModels
-            };
+            task.TaskAssignees = assigneeViewModels;
+        });
 
-            taskViewModels.Add(taskViewModel);
-        }
-        
         return taskViewModels;
     }
-    
+
     public UserTaskViewModel GetById(string id)
     {
         var task = userTaskRepository.GetById(id);
@@ -75,30 +138,28 @@ public class UserTaskServiceImpl(
             Id = task.Id,
             ChatRoomId = task.ChatRoomId,
             CreatorId = task.CreatorId,
-            Message = task.Message,
             Deadline = task.Deadline,
-            CreatedAt = task.CreatedAt,
-            Status = task.Status,
             TaskAssignees = assigneeViewModels
         };
     }
 
-    public UserTaskViewModel Create(CreateTaskViewModel task)
+    public UserTaskViewModel Create(CreateTaskViewModel task, string currentUserId)
     {
         UserTask userTask = new UserTask()
         {
             Id = Guid.NewGuid().ToString(),
+            Name = task.Name,
             ChatRoomId = task.ChatRoomId,
-            CreatorId = task.CreatorId,
-            Message = task.Message,
+            Description = task.Description,
             Deadline = task.Deadline,
-            CreatedAt = DateTime.Now,
-            Status = task.Status
+            IsCompleted = false,
+            CreatorId = currentUserId,
+            CreatedDate = DateTime.Now,
         };
     
         userTaskRepository.Add(userTask);
         
-        foreach (var assigneeId in task.TaskAssignees)
+        foreach (var assigneeId in task.TaskAssigneeIds)
         {
             var taskAssignee = new TaskAssignee
             {
@@ -114,11 +175,8 @@ public class UserTaskServiceImpl(
             Id = userTask.Id,
             ChatRoomId = userTask.ChatRoomId,
             CreatorId = userTask.CreatorId,
-            Message = userTask.Message,
             Deadline = userTask.Deadline,
-            CreatedAt = userTask.CreatedAt,
-            Status = userTask.Status,
-            TaskAssignees = task.TaskAssignees?.Select(id => new UserViewModel { Id = id }).ToList()
+            TaskAssignees = task.TaskAssigneeIds?.Select(id => new UserViewModel { Id = id }).ToList()
         };
     }
     
@@ -128,9 +186,9 @@ public class UserTaskServiceImpl(
         if (existingTask == null) 
             throw new KeyNotFoundException("Task not found.");
 
-        existingTask.Message = task.Message;
+        /*existingTask.Message = task.Message;*/
         existingTask.Deadline = task.Deadline;
-        existingTask.Status = task.Status;
+        /*existingTask.Status = task.Status;*/
 
         userTaskRepository.Update(existingTask);
         taskAssigneeRepository.DeleteByTaskId(existingTask.Id);
@@ -151,10 +209,7 @@ public class UserTaskServiceImpl(
             Id = existingTask.Id,
             ChatRoomId = existingTask.ChatRoomId,
             CreatorId = existingTask.CreatorId,
-            Message = existingTask.Message,
             Deadline = existingTask.Deadline,
-            CreatedAt = existingTask.CreatedAt,
-            Status = existingTask.Status,
             TaskAssignees = task.TaskAssignees?.Select(user => new UserViewModel { Id = user.Id }).ToList()
         };
     }
@@ -170,5 +225,15 @@ public class UserTaskServiceImpl(
         userTaskRepository.Delete(id);
     
         return true;
+    }
+
+    public void CompleteTask(string taskId)
+    {
+        UserTask? task = userTaskRepository.GetById(taskId);
+        if(task == null)
+            throw new KeyNotFoundException("Task not found.");
+        
+        task.IsCompleted = true;
+        userTaskRepository.Update(task);
     }
 }

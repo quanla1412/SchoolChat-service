@@ -6,7 +6,7 @@ public interface IUserRepository
 {
     User? GetUserById(string id);
   
-    List<User> GetUsers(string searchString, string? excludeUserId);
+    List<User> GetUsers(string searchString, string? excludeUserId, string exceptChatRoomId);
   
     List<User> GetUsersByChatRoomId(string chatRoomId);
   

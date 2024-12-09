@@ -1,6 +1,4 @@
-﻿using SchoolChat.Service.ViewModel;
-
-namespace SchoolChat.Service.Models;
+﻿namespace SchoolChat.Service.ViewModel;
 
 public class MessageViewModel
 {
@@ -12,5 +10,6 @@ public class MessageViewModel
     public bool IsPinned { get; set; }
     public bool IsUnsent { get; set; }
     public Boolean IsForwarded { get; set; }
+    public string? Type { get; set; }
     public List<ReadMessageStatusViewModel> ReadStatuses { get; set; }
 }

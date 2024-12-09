@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using SchoolChat.Service.Models;
 using SchoolChat.Service.Service;
 using SchoolChat.Service.ViewModel;
 
@@ -6,7 +8,10 @@ namespace SchoolChat.Service.Controllers;
 
 [ApiController]
 [Route("[controller]/[action]")]
-public class UserTaskController(IUserTaskService userTaskService) : ControllerBase
+public class UserTaskController(
+    UserManager<User> userManager, 
+    IUserTaskService userTaskService
+    ) : ControllerBase
 {
     [HttpGet]
     [ActionName("GetByChatRoom")]
@@ -30,15 +35,32 @@ public class UserTaskController(IUserTaskService userTaskService) : ControllerBa
             return NotFound("Task not found.");
         }
     }
+    
+    [HttpGet]
+    [ActionName("GetByUserId")]
+    public ActionResult<List<UserTaskViewModel>> GetByUserId(string userId)
+    {
+        List<UserTaskViewModel> tasks = userTaskService.GetByUserId(userId);
+        return Ok(tasks);
+    }
+    
+    [HttpGet]
+    [ActionName("CompleteTask")]
+    public IActionResult CompleteTask(string taskId)
+    {
+        userTaskService.CompleteTask(taskId);
+        return Ok();
+    }
 
     [HttpPost]
     [ActionName("Create")]
     public ActionResult<UserTaskViewModel> Create([FromBody] CreateTaskViewModel task)
     {
-        UserTaskViewModel createdTask = userTaskService.Create(task);
+        string currentUserId = userManager.GetUserId(HttpContext.User);
+        UserTaskViewModel createdTask = userTaskService.Create(task, currentUserId);
         return CreatedAtAction(nameof(GetById), new { id = createdTask.Id }, createdTask);
     }
-
+    
     [HttpPost]
     [ActionName("Update")]
     public ActionResult<UserTaskViewModel> Update([FromBody] UserTaskViewModel task)
